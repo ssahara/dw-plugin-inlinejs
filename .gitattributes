@@ -1,4 +1,5 @@
-# .gitattributes for repository dw-plugin-gview
+# .gitattributes for repository dw-plugin-InlineJS
 .gitattributes	export-ignore
 .gitignore	export-ignore
 README.md	export-ignore
+syntax/canvas.php	export-ignore
