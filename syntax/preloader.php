@@ -68,8 +68,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
   */
     public function render($mode, &$renderer, $data) {
 
-        global $ID;
+        global $ID, $conf;
         list($state, $opts, $files) = $data;
+        if ($conf['follow_htmlok'] && !$conf['htmlok']) return false;
 
         switch ($mode) {
             case 'metadata' :
