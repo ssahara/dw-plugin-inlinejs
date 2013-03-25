@@ -20,12 +20,12 @@ if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once DOKU_PLUGIN.'syntax.php';
 
-class syntax_plugin_canvas extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_inlinejs_canvas extends DokuWiki_Syntax_Plugin {
     function getType()  { return 'substition'; }
     function getPType() { return 'normal'; }
-    function getSort()  { return 305; }
+    function getSort()  { return 160; }
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('{{canvas[^}\n]+}}',$mode,'plugin_canvas');
+        $this->Lexer->addSpecialPattern('{{canvas[^}\n]+}}',$mode,'plugin_inlinejs_canvas');
     }
 
  /**
@@ -48,10 +48,11 @@ class syntax_plugin_canvas extends DokuWiki_Syntax_Plugin {
             $match = substr($match,1); // last 1 strip markup
         }
 
+        $match = trim($match);
         $tokens = preg_split('/\s+/', $match);
         foreach ($tokens as $token) {
 
-            // get width and height of iframe
+            // get width and height of canvas
             $matches=array();
             if (preg_match('/(\d+(%|em|pt|px)?)\s*([,xX]\s*(\d+(%|em|pt|px)?))?/',$token,$matches)){
                 if ($matches[4]) {
@@ -60,17 +61,18 @@ class syntax_plugin_canvas extends DokuWiki_Syntax_Plugin {
                     if (!$matches[2]) $opts['width'].= 'px'; //default to pixel when no unit was set
                     $opts['height'] = $matches[4];
                     if (!$matches[5]) $opts['width'].= 'px'; //default to pixel when no unit was set
+                    continue;
                 } elseif ($matches[2]) {
                     // only height was given
                     $opts['height'] = $matches[1];
                     if (!$matches[2]) $opts['height'].= 'px'; //default to pixel when no unit was set
+                    continue;
                 }
-                continue;
             }
-            // get chartid
-            $opts['chartid'] = $token;
-            continue;
-            }
+            // get chartid, first match prioritized
+            //restrict token characters to prevent any malicious chartid
+            if (preg_match('/[^A-Za-z0-9_-]/',$token)) continue;
+            if (empty($opts['chartid'])) $opts['chartid'] = $token;
         }
         return array($state, $opts);
     }
@@ -83,7 +85,9 @@ class syntax_plugin_canvas extends DokuWiki_Syntax_Plugin {
         if ($mode != 'xhtml') return false;
 
         list($state, $opts) = $data;
-        if ( $opts['chartid'] =='') return false;
+
+        // check whether chartid defined?
+        if (empty($opts['chartid'])) return false;
 
         switch ($opts['plotter']) {
             case 'jqplot':
@@ -96,8 +100,8 @@ class syntax_plugin_canvas extends DokuWiki_Syntax_Plugin {
 
         $html = '<'.$canvastag.' id="'.$opts['chartid'].'" class="tpl_canvas"';
         $html.= ' style="';
-        if ($opts['width'])  { $html.= ' width: '.$opts['width'].';'; }
-        if ($opts['height']) { $html.= ' height: '.$opts['height'].';'; }
+        if ($opts['width'])  { $html.= 'width: '.$opts['width'].'; '; }
+        if ($opts['height']) { $html.= 'height: '.$opts['height'].'; '; }
         $html.= '">';
         if ($canvastag == 'canvas') $html.= '[No canvas support]';
         $html.= '</'.$canvastag.'>'.NL;
