@@ -69,6 +69,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     public function render($mode, &$renderer, $data) {
 
         global $ID, $conf;
+        define("BR", "<br />\n");
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($state, $opts, $files) = $data;
@@ -80,24 +81,22 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 return true;
                 break;
             case 'xhtml' :
-                if(!$opts['debug']) return false;
+                if (!$opts['debug']) return false;
                 $meta = p_get_metadata($ID, 'plugin_inlinejs');
                 
                 // debug information: show what js/css is to be loaded in head section
                 $items = explode('|',$meta);
-                $html = '<pre>'.NL;
-                $html.= 'REMARK: This page uses additional css and/or js file(s).'.NL;
-                $html.= htmlspecialchars('<PRELOAD>').NL;
+                $html = '<div class="notify">';
+                $html.= hsc($this->getLang('preloader-intro')).BR;
                 foreach  ($items as $metaentry) {
                     $p = strrpos($metaentry, '.');
                     if ($p !== false) {
                         $metatype = substr($metaentry, $p-strlen($metaentry));
                         $metatype = strtolower($metatype);
                     } else $metatype = '';
-                    $html.= '['.$metatype.'] '.$metaentry.NL;
+                    $html.= '['.$metatype.'] '.$metaentry.BR;
                 }
-                $html.= htmlspecialchars('</PRELOAD>').NL;
-                $html.= '</pre>'.NL;
+                $html.= '</div>'.NL;
                 $renderer->doc.=$html;
                 return true;
                 break;
