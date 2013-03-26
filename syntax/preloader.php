@@ -35,12 +35,12 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
   */
     function handle($match, $state, $pos, &$handler){
 
-        $match = substr($match,8,-10);  // strip markup
+        $match = substr($match,8,-10);  // strip markup without '>' in open tag
         $opts = array( // set default
                      'debug'  => false,
                 );
 
-        // $matchの先頭が'>'以外では、何らかのオプション指定あり
+        // check whether optional parameter exists
         if ( substr($match,0,1) != '>') {
             list($param, $match) = explode('>',$match, 2);
             if (preg_match('/debug/',$param)) {
@@ -48,7 +48,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
             }
             $opts['debug'] = true;
         } else {
-            $match = substr($match,1);
+            $match = substr($match,1); // strip '>' in open tag
         }
 
         $matches = explode("\n", $match);
@@ -69,8 +69,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     public function render($mode, &$renderer, $data) {
 
         global $ID, $conf;
+        if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
+
         list($state, $opts, $files) = $data;
-        if ($conf['follow_htmlok'] && !$conf['htmlok']) return false;
 
         switch ($mode) {
             case 'metadata' :
@@ -80,8 +81,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 break;
             case 'xhtml' :
                 if(!$opts['debug']) return false;
-                resolve_pageid($ID, $id, $exists);
-                $meta = p_get_metadata($id, 'plugin_inlinejs');
+                $meta = p_get_metadata($ID, 'plugin_inlinejs');
                 
                 // debug information: show what js/css is to be loaded in head section
                 $items = explode('|',$meta);

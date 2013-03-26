@@ -44,8 +44,8 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     public function render($mode, &$renderer, $data) {
 
         global $conf;
-        //if ($mode != 'xhtml') return false;
-        if ($conf['follow_htmlok'] && !$conf['htmlok']) return false;
+        if ($mode != 'xhtml') return false;
+        if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($state, $script) = $data;
         if ( $script =='') return false;

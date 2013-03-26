@@ -29,9 +29,9 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      */
     function inlinejs_handleMeta(&$event, $param) {
 
-        global $INFO;
-        global $ID;
-        resolve_pageid($ID, $id, $exists);
+        global $ID, $INFO;
+        if (!$INFO['exists']) return;
+
         $metakey = 'plugin_inlinejs';
         $meta = p_get_metadata($id, 'plugin_inlinejs', false);
         if (empty($meta)) return;
