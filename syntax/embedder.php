@@ -48,12 +48,9 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($state, $script) = $data;
-        if ( $script =='') return false;
-
-        $html = '<script type="text/javascript">'.NL.'/*<![CDATA[*/'.NL;
-        $html.= $script;
-        $html.= '/*!]]>*/'.NL.'</script>'.NL;
-        $renderer->doc.=$html;
+        if (empty($script)) return false;
+        $helper = $this->LoadHelper('inlinejs', true);
+        $helper->renderInlineJsHtml(&$renderer,$script);
         return true;
     }
 }

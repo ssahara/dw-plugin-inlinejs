@@ -33,7 +33,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
         if (!$INFO['exists']) return;
 
         $metakey = 'plugin_inlinejs';
-        $meta = p_get_metadata($id, 'plugin_inlinejs', false);
+        $meta = p_get_metadata($ID, 'plugin_inlinejs', false);
         if (empty($meta)) return;
         $items = explode('|',$meta);
 
