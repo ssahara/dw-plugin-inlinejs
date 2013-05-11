@@ -50,7 +50,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
         list($state, $script) = $data;
         if (empty($script)) return false;
         $helper = $this->LoadHelper('inlinejs', true);
-        $helper->renderInlineJsHtml(&$renderer,$script);
+        $helper->renderInlineJsHtml($renderer,$script);
         return true;
     }
 }
