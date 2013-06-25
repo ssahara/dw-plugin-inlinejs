@@ -56,6 +56,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
                     );
                     break;
                 case ".js":
+                default:
                     $event->data['script'][] = array(
                             'type'    => 'text/javascript',
                             'charset' => 'utf-8',
