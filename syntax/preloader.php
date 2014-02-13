@@ -8,7 +8,7 @@
  * @see also: https://www.dokuwiki.org/devel:javascript
  *
  * Allow inline JavaScript in DW page. 
- * Make specified files to be loaded in head section of HTML by action compornent.
+ * Make specified files to be loaded in head section of HTML by action component.
  *
  * SYNTAX:
  *         <PRELOAD debug>
@@ -23,11 +23,16 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
-    function getType()  { return 'substition'; }
-    function getPType() { return 'normal'; }
+
+    protected $special_pattern  = '<PRELOAD.*?</PRELOAD>';
+
+    function getType()  { return 'protected'; }
+    function getPType() { return 'block'; }
     function getSort()  { return 110; }
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('<PRELOAD.*?</PRELOAD>',$mode,'plugin_inlinejs_preloader');
+        $this->Lexer->addSpecialPattern($this->special_pattern,$mode,
+            implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
+        );
     }
 
  /**
