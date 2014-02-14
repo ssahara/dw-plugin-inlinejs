@@ -32,12 +32,12 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     function getSort()  { return 305; }
     function connectTo($mode) {
         $this->Lexer->addEntryPattern($this->entry_pattern,$mode,
-            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent()))
+            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent(),))
         );
     }
     function postConnect() {
         $this->Lexer->addExitPattern($this->exit_pattern,
-            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent()))
+            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent(),))
         );
     }
 
