@@ -8,6 +8,7 @@ Syntax
 ------
 
 Embedding inline JavaScript
+
     <JS>
     ... javascript...  (block type output)
     </JS>
@@ -16,6 +17,7 @@ Embedding inline JavaScript
 
 
 Let some library files preloaded in specific DokuWiki pages
+
     <PRELOAD>
     /path/to/some.js
     /path/to/some.css
