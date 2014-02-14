@@ -7,7 +7,7 @@ Allow inline JavaScript in pages. Support both preloading in `<head>` section an
 Syntax
 ------
 
-Embedding inline JavaScript
+Embedding inline JavaScript (Use uppercase tags if you need to enclose block level elements.) 
 
     <JS>
     ... javascript...  (block type output)
