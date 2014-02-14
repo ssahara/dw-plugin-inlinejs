@@ -11,9 +11,9 @@
  * Make sure that your script embedded inside of CDATA section.
  *
  * SYNTAX:
- *         <JS>
+ *         <javascript>
  *           ... 
- *         </JS>
+ *         </javascript>
  */
 
 // must be run within Dokuwiki
@@ -22,35 +22,71 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
-    function getType()  { return 'substition'; }
-    function getPType() { return 'normal'; }
+
+    protected $entry_pattern    = '<javascript>(?=.*?</javascript>)';
+    protected $exit_pattern     = '</javascript>';
+    protected $special_pattern  = '<javascript .*?/>';
+
+    function getType()  { return 'protected'; }
+    function getPType() { return 'block'; }
     function getSort()  { return 305; }
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('<JS>.+?</JS>',$mode,'plugin_inlinejs_embedder');
+        $this->Lexer->addEntryPattern($this->entry_pattern,$mode,
+            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent(),))
+        );
+    }
+    function postConnect() {
+        $this->Lexer->addExitPattern($this->exit_pattern,
+            implode('_', array('plugin',$this->getPluginName(), $this->getPluginComponent(),))
+        );
     }
 
  /**
-  * handle syntax
+  * handle the match
   */
-    function handle($match, $state, $pos, &$handler){
-
-        $match = substr($match,4,-5);  // strip markup
-        return array($state, $match);
-    }
-
- /**
-  * Render inline javascript
-  */
-    public function render($mode, &$renderer, $data) {
+    public function handle($match, $state, $pos, &$handler){
 
         global $conf;
-        if ($mode != 'xhtml') return false;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
-        list($state, $script) = $data;
-        if (empty($script)) return false;
-        $helper = $this->LoadHelper('inlinejs', true);
-        $helper->renderInlineJsHtml($renderer,$script);
+        switch ($state) {
+            case DOKU_LEXER_ENTER:
+                return array($state,'');
+
+            case DOKU_LEXER_UNMATCHED:
+                return array($state, $match);
+
+            case DOKU_LEXER_EXIT:
+                return array($state, '');
+        }
+        return false;
+    }
+
+ /**
+  * Render <script> element
+  */
+    public function render($mode, &$renderer, $indata) {
+
+        if (empty($indata)) return false;
+        list($state, $data) = $indata;
+        if ($mode != 'xhtml') return false;
+
+        switch ($state) {
+            case DOKU_LEXER_ENTER:
+                $html = '<script type="text/javascript">'.NL.'/*<![CDATA[*/';
+                $renderer->doc .= $html;
+                break;
+
+            case DOKU_LEXER_UNMATCHED:
+                //$renderer->doc .= $renderer->_xmlEntities($data);
+                $renderer->doc .= $data; // raw write
+                break;
+
+            case DOKU_LEXER_EXIT:
+                $html = '/*!]]>*/'.NL.'</script>'.NL;
+                $renderer->doc .= $html;
+                break;
+        }
         return true;
     }
 }
