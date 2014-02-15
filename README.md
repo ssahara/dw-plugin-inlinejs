@@ -1,7 +1,7 @@
 DokuWiki plugin InlineJS
 ========================
 
-Allow inline JavaScript in pages. Support both preloading in `<head>` section and embedding in `<body>` section of HTML.
+Allow inline JavaScript and StyleSheet in pages. Support both preloading in `<head>` section and embedding in `<body>` section of HTML.
 
 
 Syntax
@@ -14,6 +14,10 @@ Embedding inline JavaScript (Use uppercase tags if you need to enclose block lev
     </JS>
 
     <js>... javascript...</js>  (output does not break paragraph)
+
+    <CSS>
+    ... style sheet...  (block type output)
+    </CSS>
 
 
 Let some library files preloaded in specific DokuWiki pages
