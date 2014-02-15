@@ -22,7 +22,6 @@ class syntax_plugin_inlinejs_embedinline extends syntax_plugin_inlinejs_embedder
 
     protected $entry_pattern    = '<js>(?=.*?</js>)';
     protected $exit_pattern     = '</js>';
-    protected $special_pattern  = '<js src=.*?/>';
 
     function getPType() { return 'normal'; }
 }

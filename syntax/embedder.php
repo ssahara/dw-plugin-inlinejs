@@ -25,16 +25,12 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
     protected $entry_pattern    = '<javascript>(?=.*?</javascript>)';
     protected $exit_pattern     = '</javascript>';
-    protected $special_pattern  = '<javascript src=.*?/>';
 
     function getType()  { return 'protected'; }
     function getPType() { return 'block'; }
     function getSort()  { return 305; }
     function connectTo($mode) {
         $this->Lexer->addEntryPattern($this->entry_pattern,$mode,
-            implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
-        );
-        $this->Lexer->addSpecialPattern($this->special_pattern,$mode,
             implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
         );
     }
@@ -64,9 +60,6 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
             case DOKU_LEXER_EXIT:
                 return array($state, '');
-
-            case DOKU_LEXER_SPECIAL:
-                return array($state, $match);
         }
         return false;
     }
@@ -94,13 +87,6 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_EXIT:
                 $html = '/*!]]>*/'.NL.'</script>'.NL;
                 $renderer->doc .= $html;
-                break;
-
-            case DOKU_LEXER_SPECIAL:
-                if (preg_match('|src="?(.+\.js)"?[ /]|', $data, $matches)) {
-                    $html = '<script type="text/javascript" src="'.$matches[1].'"></script>'.NL;
-                    $renderer->doc .= $html;
-                }
                 break;
         }
         return true;

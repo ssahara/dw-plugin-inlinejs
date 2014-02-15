@@ -1,7 +1,7 @@
 base   inlinejs
 author Satoshi Sahara
 email  sahara.satoshi@gmail.com
-date   2014-02-14
+date   2014-02-15
 name   Inline Javascript plugin
-desc   Allow inline JavaScript in DW page. Support both preloading in <head> section and embedding in <body> section of HTML.
+desc   Allow spot-based embedding of JavaScript and StyleSheet in the page
 url    https://www.dokuwiki.org/plugin:inlinejs
