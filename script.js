@@ -7,16 +7,16 @@
 
 jQuery(function() {
     if (typeof JSINFO.server == 'undefined') return;
-    jQuery('p:contains("~~REMOTE_ADDR~~"), li:contains("~~REMOTE_ADDR~~"), table:contains("~~REMOTE_ADDR~~")').each(function(){
+    jQuery('p:contains(" ~~REMOTE_ADDR~~"), li:contains(" ~~REMOTE_ADDR~~"), table:contains(" ~~REMOTE_ADDR~~")').each(function(){
         var txt = jQuery(this).html();
         jQuery(this).html(
-            txt.replace(/~~REMOTE_ADDR~~/g,JSINFO.server.REMOTE_ADDR)
+            txt.replace(/ ~~REMOTE_ADDR~~/g,JSINFO.server.REMOTE_ADDR)
         );
     });
-    jQuery('p:contains("~~SERVER_ADDR~~"), li:contains("~~SERVER_ADDR~~"), table:contains("~~SERVER_ADDR~~")').each(function(){
+    jQuery('p:contains(" ~~SERVER_ADDR~~"), li:contains(" ~~SERVER_ADDR~~"), table:contains(" ~~SERVER_ADDR~~")').each(function(){
         var txt = jQuery(this).html();
         jQuery(this).html(
-            txt.replace(/~~SERVER_ADDR~~/g,JSINFO.server.SERVER_ADDR)
+            txt.replace(/ ~~SERVER_ADDR~~/g,JSINFO.server.SERVER_ADDR)
         );
     });
 });

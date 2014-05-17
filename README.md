@@ -27,6 +27,15 @@ Let some library files preloaded in specific DokuWiki pages
     /path/to/some.css
     </PRELOAD>
 
+
+Macro those replaced by Javascript: Put a space char in front of macro strings to enable replacement in which the space char is removed. 
+
+```
+  ~~SERVER_ADDR~~
+  ~~REMOTE_ADDR~~
+```
+
+
 ----
 Licensed under the GNU Public License (GPL) version 2
 
