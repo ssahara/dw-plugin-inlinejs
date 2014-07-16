@@ -26,10 +26,10 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $special_pattern  = '<PRELOAD.*?</PRELOAD>';
 
-    function getType()  { return 'protected'; }
-    function getPType() { return 'block'; }
-    function getSort()  { return 110; }
-    function connectTo($mode) {
+    public function getType()  { return 'protected'; }
+    public function getPType() { return 'block'; }
+    public function getSort()  { return 110; }
+    public function connectTo($mode) {
         $this->Lexer->addSpecialPattern($this->special_pattern,$mode,
             implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
         );
@@ -38,7 +38,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
  /**
   * handle syntax
   */
-    function handle($match, $state, $pos, &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler) {
 
         $match = substr($match,8,-10);  // strip markup without '>' in open tag
         $opts = array( // set default
@@ -71,7 +71,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
  /**
   * Render metadata
   */
-    public function render($mode, &$renderer, $data) {
+    public function render($format, Doku_Renderer $renderer, $data) {
 
         global $ID, $conf;
         define("BR", "<br />\n");
@@ -79,7 +79,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
         list($state, $opts, $files) = $data;
 
-        switch ($mode) {
+        switch ($format) {
             case 'metadata' :
                 // metadata will be treated by action plugin
                 $renderer->meta['plugin_inlinejs'] = implode('|',$files);

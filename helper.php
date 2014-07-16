@@ -32,7 +32,7 @@ class helper_plugin_inlinejs extends DokuWiki_Plugin {
     /**
      * render HTML of inline JavaScript
      */
-    function renderInlineJsHtml(&$renderer,$script) {
+    function renderInlineJsHtml(Doku_Renderer $renderer, $script) {
         if (empty($script)) return false;
 
         $html = '<script type="text/javascript">'.NL.'/*<![CDATA[*/'.NL;

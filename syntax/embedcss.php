@@ -22,17 +22,17 @@ class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
     protected $entry_pattern    = '<CSS>(?=.*?</CSS>)';
     protected $exit_pattern     = '</CSS>';
 
-    function getPType() { return 'block'; }
+    public function getPType() { return 'block'; }
 
 
  /**
   * Render <script> element
   */
-    public function render($mode, &$renderer, $indata) {
+    public function render($format, Doku_Renderer $renderer, $indata) {
 
         if (empty($indata)) return false;
         list($state, $data) = $indata;
-        if ($mode != 'xhtml') return false;
+        if ($format != 'xhtml') return false;
 
         switch ($state) {
             case DOKU_LEXER_ENTER:

@@ -19,7 +19,7 @@ require_once (DOKU_INC.'inc/parserutils.php');
 class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
     // register hook
-    function register(&$controller) {
+    public function register(Doku_Event_Handler $controller) {
         $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, '_exportToJSINFO');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'inlinejs_handleMeta');
     }
@@ -43,7 +43,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      * add inline javascript and/or stylesheet to the <head> section.
      *
      */
-    function inlinejs_handleMeta(&$event, $param) {
+    public function inlinejs_handleMeta(&$event, $param) {
 
         global $ID, $INFO;
         if (!$INFO['exists']) return;
