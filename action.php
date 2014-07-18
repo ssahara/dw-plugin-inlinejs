@@ -28,7 +28,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      * export $_SERVER to JSINFO
      *
      */
-    public function _exportToJSINFO(&$event) {
+    public function _exportToJSINFO(Doku_Event &$event, $param) {
         global $JSINFO;
         //$JSINFO['server'] = $_SERVER;
         $JSINFO['server'] = array(
@@ -43,7 +43,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      * add inline javascript and/or stylesheet to the <head> section.
      *
      */
-    public function inlinejs_handleMeta(&$event, $param) {
+    public function inlinejs_handleMeta(Doku_Event &$event, $param) {
 
         global $ID, $INFO;
         if (!$INFO['exists']) return;

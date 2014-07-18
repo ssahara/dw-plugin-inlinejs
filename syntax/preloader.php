@@ -38,7 +38,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
  /**
   * handle syntax
   */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    public function handle($match, $state, $pos, Doku_Handler &$handler) {
 
         $match = substr($match,8,-10);  // strip markup without '>' in open tag
         $opts = array( // set default
@@ -71,7 +71,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
  /**
   * Render metadata
   */
-    public function render($format, Doku_Renderer $renderer, $data) {
+    public function render($format, Doku_Renderer &$renderer, $data) {
 
         global $ID, $conf;
         define("BR", "<br />\n");

@@ -43,7 +43,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
  /**
   * handle the match
   */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    public function handle($match, $state, $pos, Doku_Handler &$handler) {
 
         global $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
@@ -67,7 +67,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
  /**
   * Render <script> element
   */
-    public function render($format, Doku_Renderer $renderer, $indata) {
+    public function render($format, Doku_Renderer &$renderer, $indata) {
 
         if (empty($indata)) return false;
         list($state, $data) = $indata;
