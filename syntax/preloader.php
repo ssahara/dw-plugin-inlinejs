@@ -19,8 +19,6 @@
 
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
-if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
@@ -61,11 +59,11 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
         $matches = explode("\n", $match);
         $n = count($matches);
-        //$files[] = array();
+        $files = array();
         for ($i=0; $i<$n; $i++) {
-            $match = trim($matches[$i]);
             // remove comment line after "#"
-            list($filepath, $comment) = explode('#', $match, 2);
+            list($filepath, $comment) = explode('#', $matches[$i], 2);
+            $filepath = trim($filepath);
             if ( !empty($filepath) ) $files[] = $filepath;
         }
         return array($state, $opts, $files);
@@ -87,7 +85,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 // metadata will be treated by action plugin
                 $renderer->meta['plugin_inlinejs'] = implode('|',$files);
                 return true;
-                break;
+
             case 'xhtml' :
                 if (!$opts['debug']) return false;
                 $meta = p_get_metadata($ID, 'plugin_inlinejs');
@@ -107,7 +105,6 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 $html.= '</div>'.NL;
                 $renderer->doc.=$html;
                 return true;
-                break;
         }
         return false;
     }

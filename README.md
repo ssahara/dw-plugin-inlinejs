@@ -42,5 +42,5 @@ Licensed under the GNU Public License (GPL) version 2
 More information is available:
   * https://www.dokuwiki.org/plugin:inlinejs
 
-(c) 2014 Satoshi Sahara \<sahara.satoshi@gmail.com>
+(c) 2014-2015 Satoshi Sahara \<sahara.satoshi@gmail.com>
 
