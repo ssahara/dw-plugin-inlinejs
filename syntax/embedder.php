@@ -18,26 +18,25 @@
 
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
-if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
     protected $entry_pattern    = '<javascript>(?=.*?</javascript>)';
     protected $exit_pattern     = '</javascript>';
+    protected $pluginMode;
+
+    public function __construct() {
+        $this->pluginMode = substr(get_class($this), 7); // drop 'syntax_'
+    }
 
     public function getType()  { return 'protected'; }
     public function getPType() { return 'block'; }
     public function getSort()  { return 305; }
     public function connectTo($mode) {
-        $this->Lexer->addEntryPattern($this->entry_pattern,$mode,
-            implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
-        );
+        $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->pluginMode);
     }
     public function postConnect() {
-        $this->Lexer->addExitPattern($this->exit_pattern,
-            implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
-        );
+        $this->Lexer->addExitPattern($this->exit_pattern,$ this->pluginMode);
     }
 
  /**

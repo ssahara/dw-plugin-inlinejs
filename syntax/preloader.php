@@ -25,14 +25,17 @@ require_once DOKU_PLUGIN.'syntax.php';
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $special_pattern  = '<PRELOAD.*?</PRELOAD>';
+    protected $pluginMode;
+
+    public function __construct() {
+        $this->pluginMode = substr(get_class($this), 7); // drop 'syntax_'
+    }
 
     public function getType()  { return 'protected'; }
     public function getPType() { return 'block'; }
     public function getSort()  { return 110; }
     public function connectTo($mode) {
-        $this->Lexer->addSpecialPattern($this->special_pattern,$mode,
-            implode('_', array('plugin',$this->getPluginName(),$this->getPluginComponent(),))
-        );
+        $this->Lexer->addSpecialPattern($this->special_pattern, $mode, $this->pluginMode);
     }
 
  /**
