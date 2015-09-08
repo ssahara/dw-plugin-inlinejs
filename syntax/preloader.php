@@ -24,7 +24,7 @@ require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
-    protected $special_pattern  = '<PRELOAD.*?</PRELOAD>';
+    protected $special_pattern  = '<PRELOAD\b.*?</PRELOAD>';
     protected $pluginMode;
 
     public function __construct() {
