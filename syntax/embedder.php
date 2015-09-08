@@ -36,7 +36,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->pluginMode);
     }
     public function postConnect() {
-        $this->Lexer->addExitPattern($this->exit_pattern,$ this->pluginMode);
+        $this->Lexer->addExitPattern($this->exit_pattern, $this->pluginMode);
     }
 
  /**
