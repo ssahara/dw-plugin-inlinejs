@@ -38,12 +38,10 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
     public function inlinejs_handleMeta(Doku_Event $event, $param) {
 
         global $ID, $INFO;
-        if (!$INFO['exists']) return;
 
-        $metakey = 'plugin_inlinejs';
-        $meta = p_get_metadata($ID, 'plugin_inlinejs', false);
-        if (empty($meta)) return;
-        $items = explode('|',$meta);
+        $metadata = $INFO['meta']['plugin_inlinejs'];
+        if (!$metadata) return;
+        $items = explode('|',$metadata);
 
         foreach ($items as $entry) {
             // check file name extention
