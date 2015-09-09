@@ -89,18 +89,16 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
             case 'xhtml' :
                 if (!$opts['debug']) return false;
                 $meta = p_get_metadata($ID, 'plugin_inlinejs');
-                
+
                 // debug information: show what js/css is to be loaded in head section
                 $items = explode('|',$meta);
                 $html = '<div class="notify">';
                 $html.= hsc($this->getLang('preloader-intro')).BR;
-                foreach  ($items as $metaentry) {
-                    $p = strrpos($metaentry, '.');
-                    if ($p !== false) {
-                        $metatype = substr($metaentry, $p-strlen($metaentry));
-                        $metatype = strtolower($metatype);
-                    } else $metatype = '';
-                    $html.= '['.$metatype.'] '.$metaentry.BR;
+                foreach  ($items as $entry) {
+                    // check file name extention
+                    $entrytype = pathinfo($entry, PATHINFO_EXTENSION);
+                    if (is_null($entrytype)) $entrytype = '';
+                    $html.= '['.$entrytype.'] '.$entry.BR;
                 }
                 $html.= '</div>'.NL;
                 $renderer->doc.=$html;
