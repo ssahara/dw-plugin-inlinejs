@@ -1,7 +1,7 @@
 base   inlinejs
 author Satoshi Sahara
 email  sahara.satoshi@gmail.com
-date   2014-08-05
-name   Inline Javascript plugin
+date   2015-09-09
+name   Inline Javascript and CSS plugin
 desc   Allow spot-based embedding of JavaScript and StyleSheet in the page. Additonal macro for a few elements of $_SERVER array is available.
 url    https://www.dokuwiki.org/plugin:inlinejs
