@@ -2,8 +2,8 @@
 /**
  * Helper Component for the InlineJS Plugin
  *
- * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
- * @author  Sahara Satoshi <sahara.satoshi@gmail.com>
+ * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
+ * @author  Satoshi Sahara <sahara.satoshi@gmail.com>
  */
 
 // must be run within Dokuwiki

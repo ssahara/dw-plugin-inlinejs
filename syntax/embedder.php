@@ -3,7 +3,7 @@
  * DokuWiki Syntax Plugin InlineJS Embedder
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
- * @author  Sahara Satoshi <sahara.satoshi@gmail.com>
+ * @author  Satoshi Sahara <sahara.satoshi@gmail.com>
  *
  * @see also: https://www.dokuwiki.org/devel:javascript
  *
