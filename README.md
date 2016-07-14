@@ -1,7 +1,7 @@
 DokuWiki plugin InlineJS
 ========================
 
-Allow inline JavaScript and StyleSheet in pages. Support both preloading in `<head>` section and embedding in `<body>` section of HTML.
+Allow internal JavaScript and StyleSheet in wiki pages.
 
 
 Syntax
