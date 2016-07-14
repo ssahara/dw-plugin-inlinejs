@@ -23,20 +23,20 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
     protected $entry_pattern    = '<javascript>(?=.*?</javascript>)';
     protected $exit_pattern     = '</javascript>';
-    protected $pluginMode;
+    protected $mode;
 
     public function __construct() {
-        $this->pluginMode = substr(get_class($this), 7); // drop 'syntax_'
+        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
     }
 
     public function getType()  { return 'protected'; }
     public function getPType() { return 'block'; }
     public function getSort()  { return 305; }
     public function connectTo($mode) {
-        $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->pluginMode);
+        $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->mode);
     }
     public function postConnect() {
-        $this->Lexer->addExitPattern($this->exit_pattern, $this->pluginMode);
+        $this->Lexer->addExitPattern($this->exit_pattern, $this->mode);
     }
 
  /**
@@ -74,7 +74,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
         switch ($state) {
             case DOKU_LEXER_ENTER:
-                $html = '<script type="text/javascript">'.NL.'/*<![CDATA[*/';
+                $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
                 $renderer->doc .= $html;
                 break;
 
@@ -84,7 +84,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
                 break;
 
             case DOKU_LEXER_EXIT:
-                $html = '/*!]]>*/'.NL.'</script>'.NL;
+                $html = '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
                 $renderer->doc .= $html;
                 break;
         }

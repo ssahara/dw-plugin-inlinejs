@@ -23,17 +23,17 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $special_pattern  = '<PRELOAD\b.*?</PRELOAD>';
-    protected $pluginMode;
+    protected $mode;
 
     public function __construct() {
-        $this->pluginMode = substr(get_class($this), 7); // drop 'syntax_'
+        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
     }
 
     public function getType()  { return 'protected'; }
     public function getPType() { return 'block'; }
     public function getSort()  { return 110; }
     public function connectTo($mode) {
-        $this->Lexer->addSpecialPattern($this->special_pattern, $mode, $this->pluginMode);
+        $this->Lexer->addSpecialPattern($this->special_pattern, $mode, $this->mode);
     }
 
  /**
@@ -41,20 +41,20 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
   */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
 
-        $match = substr($match,8,-10);  // strip markup without '>' in open tag
+        $match = substr($match, 8, -10);  // strip markup without '>' in open tag
         $opts = array( // set default
                      'debug'  => false,
                 );
 
         // check whether optional parameter exists
-        if ( substr($match,0,1) != '>') {
+        if ( substr($match, 0, 1) != '>') {
             list($param, $match) = explode('>',$match, 2);
             if (preg_match('/debug/',$param)) {
                 $opts['debug'] = true;
             }
             $opts['debug'] = true;
         } else {
-            $match = substr($match,1); // strip '>' in open tag
+            $match = substr($match, 1); // strip '>' in open tag
         }
 
         $matches = explode("\n", $match);
@@ -75,7 +75,6 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     public function render($format, Doku_Renderer $renderer, $data) {
 
         global $ID, $conf;
-        define("BR", "<br />\n");
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($state, $opts, $files) = $data;
@@ -83,7 +82,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         switch ($format) {
             case 'metadata' :
                 // metadata will be treated by action plugin
-                $renderer->meta['plugin_inlinejs'] = implode('|',$files);
+                $renderer->meta['plugin_inlinejs'] = implode('|', $files);
                 return true;
 
             case 'xhtml' :
@@ -91,17 +90,17 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 $meta = p_get_metadata($ID, 'plugin_inlinejs');
 
                 // debug information: show what js/css is to be loaded in head section
-                $items = explode('|',$meta);
-                $html = '<div class="notify">';
-                $html.= hsc($this->getLang('preloader-intro')).BR;
+                $items = explode('|', $meta);
+                $html  = '<div class="notify">';
+                $html .= hsc($this->getLang('preloader-intro')).'<br />'.DOKU_LF;
                 foreach  ($items as $entry) {
                     // check file name extention
                     $entrytype = pathinfo($entry, PATHINFO_EXTENSION);
                     if (is_null($entrytype)) $entrytype = '';
-                    $html.= '['.$entrytype.'] '.$entry.BR;
+                    $html .= '['.$entrytype.'] '.$entry.'<br />'.DOKU_LF;
                 }
-                $html.= '</div>'.NL;
-                $renderer->doc.=$html;
+                $html .= '</div>'.DOKU_LF;
+                $renderer->doc .= $html;
                 return true;
         }
         return false;

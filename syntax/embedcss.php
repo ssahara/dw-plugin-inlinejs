@@ -36,7 +36,7 @@ class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
 
         switch ($state) {
             case DOKU_LEXER_ENTER:
-                $html = '<style type="text/css">'.NL.'<!-- ';
+                $html = '<style type="text/css">'.DOKU_LF.'<!-- ';
                 $renderer->doc .= $html;
                 break;
 
@@ -46,7 +46,7 @@ class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
                 break;
 
             case DOKU_LEXER_EXIT:
-                $html = ' -->'.NL.'</style>'.NL;
+                $html = ' -->'.DOKU_LF.'</style>'.DOKU_LF;
                 $renderer->doc .= $html;
                 break;
         }
