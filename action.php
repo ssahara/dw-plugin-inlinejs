@@ -12,24 +12,9 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
     // register hook
     public function register(Doku_Event_Handler $controller) {
-        $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, '_exportToJSINFO');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'inlinejs_handleMeta');
     }
 
-    /**
-     * export $_SERVER to JSINFO
-     *
-     */
-    public function _exportToJSINFO(Doku_Event $event, $param) {
-        global $JSINFO;
-        //$JSINFO['server'] = $_SERVER;
-        $JSINFO['server'] = array(
-            'SERVER_NAME' => $_SERVER['SERVER_NAME'],
-            'SERVER_ADDR' => $_SERVER['SERVER_ADDR'],
-            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'],
-            'REMOTE_USER' => $_SERVER['REMOTE_USER'],
-        );
-    }
 
     /**
      * add inline javascript and/or stylesheet to the <head> section.
@@ -37,7 +22,7 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      */
     public function inlinejs_handleMeta(Doku_Event $event, $param) {
 
-        global $ID, $INFO;
+        global $INFO;
 
         $metadata = $INFO['meta']['plugin_inlinejs'];
         if (!$metadata) return;

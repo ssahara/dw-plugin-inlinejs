@@ -28,19 +28,11 @@ Let some library files preloaded in specific DokuWiki pages
     </PRELOAD>
 
 
-Macro those replaced by Javascript: Put a space char in front of macro strings to enable replacement in which the space char is removed. 
-
-```
-  ~~SERVER_ADDR~~
-  ~~REMOTE_ADDR~~
-```
-
-
 ----
 Licensed under the GNU Public License (GPL) version 2
 
 More information is available:
   * https://www.dokuwiki.org/plugin:inlinejs
 
-(c) 2014-2015 Satoshi Sahara \<sahara.satoshi@gmail.com>
+(c) 2014-2016 Satoshi Sahara \<sahara.satoshi@gmail.com>
 
