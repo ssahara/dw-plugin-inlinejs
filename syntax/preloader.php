@@ -93,7 +93,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 $items = explode('|', $meta);
                 $html  = '<div class="notify">';
                 $html .= hsc($this->getLang('preloader-intro')).'<br />'.DOKU_LF;
-                foreach  ($items as $entry) {
+                foreach ($items as $entry) {
                     // check file name extention
                     $entrytype = pathinfo($entry, PATHINFO_EXTENSION);
                     if (is_null($entrytype)) $entrytype = '';

@@ -24,9 +24,9 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
         global $INFO;
 
-        $metadata = $INFO['meta']['plugin_inlinejs'];
-        if (!$metadata) return;
-        $items = explode('|',$metadata);
+        if (!isset($INFO['meta']['plugin_inlinejs'])) return;
+
+        $items = explode('|',$INFO['meta']['plugin_inlinejs']);
 
         foreach ($items as $entry) {
             // check file name extention
