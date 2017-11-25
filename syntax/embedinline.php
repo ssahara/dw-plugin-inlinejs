@@ -20,8 +20,15 @@ require_once(dirname(__FILE__).'/embedder.php');
 
 class syntax_plugin_inlinejs_embedinline extends syntax_plugin_inlinejs_embedder {
 
-    protected $entry_pattern    = '<js>(?=.*?</js>)';
-    protected $exit_pattern     = '</js>';
+    //protected $mode, $pattern;
+
+    function __construct() {
+        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+
+        // syntax pattern
+        $this->pattern[1] = '<js>(?=.*?</js>)';
+        $this->pattern[4] = '</js>';
+    }
 
     function getPType() { return 'normal'; }
 }

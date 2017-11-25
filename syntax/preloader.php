@@ -22,11 +22,11 @@ if (!defined('DOKU_INC')) die();
 
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
-    protected $special_pattern  = '<PRELOAD\b.*?</PRELOAD>';
-    protected $mode;
+    protected $mode, $pattern;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+        $this->pattern[5] = '<PRELOAD\b.*?</PRELOAD>';
     }
 
     function getType()  { return 'protected'; }
@@ -37,11 +37,11 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern($this->special_pattern, $mode, $this->mode);
+        $this->Lexer->addSpecialPattern($this->pattern[5], $mode, $this->mode);
     }
 
     /**
-     * handle the match
+     * Handle the match
      */
     function handle($match, $state, $pos, Doku_Handler $handler) {
 

@@ -21,12 +21,14 @@ if (!defined('DOKU_INC')) die();
 
 class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
-    protected $entry_pattern    = '<javascript>(?=.*?</javascript>)';
-    protected $exit_pattern     = '</javascript>';
-    protected $mode;
+    protected $mode, $pattern;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+
+        // syntax pattern
+        $this->pattern[1] = '<javascript>(?=.*?</javascript>)';
+        $this->pattern[4] = '</javascript>';
     }
 
     function getType()  { return 'protected'; }
@@ -37,10 +39,10 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->mode);
+        $this->Lexer->addEntryPattern($this->pattern[1], $mode, $this->mode);
     }
     function postConnect() {
-        $this->Lexer->addExitPattern($this->exit_pattern, $this->mode);
+        $this->Lexer->addExitPattern($this->pattern[4], $this->mode);
     }
 
     /**

@@ -20,8 +20,15 @@ require_once(dirname(__FILE__).'/embedder.php');
 
 class syntax_plugin_inlinejs_embedblock extends syntax_plugin_inlinejs_embedder {
 
-    protected $entry_pattern    = '<JS>(?=.*?</JS>)';
-    protected $exit_pattern     = '</JS>';
+    //protected $mode, $pattern;
+
+    function __construct() {
+        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+
+        // syntax pattern
+        $this->pattern[1] = '<JS>(?=.*?</JS>)';
+        $this->pattern[4] = '</JS>';
+    }
 
     function getPType() { return 'block'; }
 }

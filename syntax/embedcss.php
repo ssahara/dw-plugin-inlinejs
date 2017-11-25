@@ -19,14 +19,21 @@ require_once(dirname(__FILE__).'/embedder.php');
 
 class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
 
-    protected $entry_pattern    = '<CSS>(?=.*?</CSS>)';
-    protected $exit_pattern     = '</CSS>';
+    //protected $mode, $pattern;
+
+    function __construct() {
+        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+
+        // syntax pattern
+        $this->pattern[1] = '<CSS>(?=.*?</CSS>)';
+        $this->pattern[4] = '</CSS>';
+    }
 
     function getPType() { return 'block'; }
 
 
     /**
-     * Connect pattern to lexer
+     * Create output
      */
     function render($format, Doku_Renderer $renderer, $indata) {
 
