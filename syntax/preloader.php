@@ -62,15 +62,23 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         }
 
         $matches = explode("\n", $match);
-        $n = count($matches);
-        $files = array();
-        for ($i=0; $i<$n; $i++) {
+        $entries = array();
+        foreach ($matches as $entry) {
             // remove comment line after "#"
-            list($filepath, $comment) = explode('#', $matches[$i], 2);
-            $filepath = trim($filepath);
-            if ( !empty($filepath) ) $files[] = $filepath;
+            list($pathname, $comment) = explode('#', $entry, 2);
+            $pathname = trim($pathname);
+            if (empty($pathname) ) continue;
+
+            // check entry type
+            $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
+            if (in_array($entrytype, array('css','js'))) {
+                $entries[] = array(
+                    'type' => $entrytype,
+                    'path' => $pathname,
+                );
+            }
         }
-        return array($state, $opts, $files);
+        return (count($entries)) ? array($opts, $entries) : false;
     }
 
     /**
@@ -81,30 +89,25 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         global $ID, $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
-        list($state, $opts, $files) = $data;
+        list($opts, $entries) = $data;
 
         switch ($format) {
             case 'metadata' :
                 // metadata will be treated by action plugin
-                $renderer->meta['plugin_inlinejs'] = implode('|', $files);
+                $renderer->meta['plugin_inlinejs'] = $entries;
                 return true;
 
             case 'xhtml' :
-                if (!$opts['debug']) return false;
-                $meta = p_get_metadata($ID, 'plugin_inlinejs');
-
-                // debug information: show what js/css is to be loaded in head section
-                $items = explode('|', $meta);
-                $html  = '<div class="notify">';
-                $html .= hsc($this->getLang('preloader-intro')).'<br />'.DOKU_LF;
-                foreach ($items as $entry) {
-                    // check file name extention
-                    $entrytype = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (is_null($entrytype)) $entrytype = '';
-                    $html .= '['.$entrytype.'] '.$entry.'<br />'.DOKU_LF;
+                if ($opts['debug']) {
+                    // debug: show what js/css is to be loaded in head section
+                    $html = '<div class="notify">';
+                    $html.= hsc($this->getLang('preloader-intro')).'<br />';
+                    foreach ($entries as $entry) {
+                        $html.= '['.$entry['type'].'] '.$entry['path'].'<br />';
+                    }
+                    $html.= '</div>'.DOKU_LF;
+                    $renderer->doc .= $html;
                 }
-                $html .= '</div>'.DOKU_LF;
-                $renderer->doc .= $html;
                 return true;
         }
         return false;

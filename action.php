@@ -26,29 +26,25 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
         if (!isset($INFO['meta']['plugin_inlinejs'])) return;
 
-        $items = explode('|',$INFO['meta']['plugin_inlinejs']);
-
-        foreach ($items as $entry) {
-            // check file name extention
-            $entrytype = pathinfo($entry, PATHINFO_EXTENSION);
-            switch ($entrytype) {
-                case ".css":
+        foreach ($INFO['meta']['plugin_inlinejs'] as $entry) {
+            switch ($entry['type']) {
+                case 'css':
                     $event->data['link'][] = array(
                             'rel'     => 'stylesheet',
                             'type'    => 'text/css',
-                            'href'    => $entry,
+                            'href'    => $entry['path'],
                     );
                     break;
-                case ".js":
-                default:
+                case 'js':
                     $event->data['script'][] = array(
                             'type'    => 'text/javascript',
                             'charset' => 'utf-8',
-                            'src'    => $entry,
+                            'src'    => $entry['path'],
                             '_data'   => '',
-                     );
+                    );
                     break;
             }
         }
+        return;
     }
 }
