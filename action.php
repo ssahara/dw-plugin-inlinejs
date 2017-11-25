@@ -11,16 +11,16 @@ if(!defined('DOKU_INC')) die();
 class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
     // register hook
-    public function register(Doku_Event_Handler $controller) {
+    function register(Doku_Event_Handler $controller) {
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'inlinejs_handleMeta');
     }
 
 
     /**
+     * TPL_METAHEADER_OUTPUT
      * add inline javascript and/or stylesheet to the <head> section.
-     *
      */
-    public function inlinejs_handleMeta(Doku_Event $event, $param) {
+    function inlinejs_handleMeta(Doku_Event $event, $param) {
 
         global $INFO;
 

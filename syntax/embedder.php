@@ -25,24 +25,28 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     protected $exit_pattern     = '</javascript>';
     protected $mode;
 
-    public function __construct() {
+    function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
     }
 
-    public function getType()  { return 'protected'; }
-    public function getPType() { return 'block'; }
-    public function getSort()  { return 305; }
-    public function connectTo($mode) {
+    function getType()  { return 'protected'; }
+    function getPType() { return 'block'; }
+    function getSort()  { return 305; }
+
+    /**
+     * Connect pattern to lexer
+     */
+    function connectTo($mode) {
         $this->Lexer->addEntryPattern($this->entry_pattern, $mode, $this->mode);
     }
-    public function postConnect() {
+    function postConnect() {
         $this->Lexer->addExitPattern($this->exit_pattern, $this->mode);
     }
 
- /**
-  * handle the match
-  */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    /**
+     * handle the match
+     */
+    function handle($match, $state, $pos, Doku_Handler $handler) {
 
         global $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
@@ -63,10 +67,10 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
         return false;
     }
 
- /**
-  * Render <script> element
-  */
-    public function render($format, Doku_Renderer $renderer, $indata) {
+    /**
+     * Create output
+     */
+    function render($format, Doku_Renderer $renderer, $indata) {
 
         if (empty($indata)) return false;
         list($state, $data) = $indata;

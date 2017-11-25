@@ -25,21 +25,25 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     protected $special_pattern  = '<PRELOAD\b.*?</PRELOAD>';
     protected $mode;
 
-    public function __construct() {
+    function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
     }
 
-    public function getType()  { return 'protected'; }
-    public function getPType() { return 'block'; }
-    public function getSort()  { return 110; }
-    public function connectTo($mode) {
+    function getType()  { return 'protected'; }
+    function getPType() { return 'block'; }
+    function getSort()  { return 110; }
+
+    /**
+     * Connect pattern to lexer
+     */
+    function connectTo($mode) {
         $this->Lexer->addSpecialPattern($this->special_pattern, $mode, $this->mode);
     }
 
- /**
-  * handle syntax
-  */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    /**
+     * handle the match
+     */
+    function handle($match, $state, $pos, Doku_Handler $handler) {
 
         $match = substr($match, 8, -10);  // strip markup without '>' in open tag
         $opts = array( // set default
@@ -69,10 +73,10 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         return array($state, $opts, $files);
     }
 
- /**
-  * Render metadata
-  */
-    public function render($format, Doku_Renderer $renderer, $data) {
+    /**
+     * Create output
+     */
+    function render($format, Doku_Renderer $renderer, $data) {
 
         global $ID, $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
