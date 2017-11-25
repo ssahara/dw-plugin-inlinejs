@@ -13,7 +13,8 @@
  * SYNTAX:
  *         <PRELOAD debug>
  *           /path/to/javascript.js
- *           /path/to/stylesheet.css 
+ *           /path/to/stylesheet.css
+ *           <link rel="stylesheet" href="//path/css">
  *         </PRELOAD>
  */
 
@@ -26,6 +27,8 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+
+        // syntax pattern
         $this->pattern[5] = '<PRELOAD\b.*?</PRELOAD>';
     }
 
@@ -70,7 +73,16 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
             if (empty($pathname) ) continue;
 
             // check entry type
-            $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
+            if (preg_match('/^<link .*>$/', $pathname)) {
+                // assume rel="stylesheet", lazy handling of external css
+                if (preg_match('/\bhref=\"([^\"]*)\" ?/', $pathname, $attrs)) {
+                    $pathname = $attrs[1];
+                    $entrytype = 'css';
+                }
+            } else {
+                // local file
+                $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
+            }
             if (in_array($entrytype, array('css','js'))) {
                 $entries[] = array(
                     'type' => $entrytype,

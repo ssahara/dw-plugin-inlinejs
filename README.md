@@ -23,8 +23,9 @@ Embedding inline JavaScript (Use uppercase tags if you need to enclose block lev
 Let some library files preloaded in specific DokuWiki pages
 
     <PRELOAD>
-    /path/to/some.js
+    /path/to/some.js     # depends on document root of web server
     /path/to/some.css
+    <link rel="stylesheet" href="http://example.com/css?key=value">  # external css
     </PRELOAD>
 
 
@@ -34,5 +35,5 @@ Licensed under the GNU Public License (GPL) version 2
 More information is available:
   * https://www.dokuwiki.org/plugin:inlinejs
 
-(c) 2014-2016 Satoshi Sahara \<sahara.satoshi@gmail.com>
+(c) 2014-2017 Satoshi Sahara \<sahara.satoshi@gmail.com>
 
