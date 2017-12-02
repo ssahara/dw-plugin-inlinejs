@@ -14,7 +14,7 @@
  *         <PRELOAD debug>
  *           /path/to/javascript.js
  *           /path/to/stylesheet.css
- *           <link rel="stylesheet" href="//path/css">
+ *           <link rel="stylesheet" href="//example.com/css">
  *         </PRELOAD>
  */
 
@@ -113,9 +113,10 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 if ($opts['debug']) {
                     // debug: show what js/css is to be loaded in head section
                     $html = '<div class="notify">';
-                    $html.= hsc($this->getLang('preloader-intro')).'<br />';
+                    $html.= hsc($this->getLang('preloader-intro')).DOKU_LF;
                     foreach ($entries as $entry) {
-                        $html.= '['.$entry['type'].'] '.$entry['path'].'<br />';
+                        $out = '['.$entry['type'].'] '.$entry['path'].'<br />';
+                        $html.= '<div style="white-space:pre; padding:0.1em;">'.hsc($out).'</div>'.DOKU_LF;
                     }
                     $html.= '</div>'.DOKU_LF;
                     $renderer->doc .= $html;
