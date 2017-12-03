@@ -27,19 +27,19 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
         if (!isset($INFO['meta']['plugin_inlinejs'])) return;
 
         foreach ($INFO['meta']['plugin_inlinejs'] as $entry) {
-            switch ($entry['type']) {
-                case 'css':
+            switch ($entry['_tag']) {
+                case 'link':
                     $event->data['link'][] = array(
                             'rel'     => 'stylesheet',
                             'type'    => 'text/css',
-                            'href'    => $entry['path'],
+                            'href'    => $entry['href'],
                     );
                     break;
-                case 'js':
+                case 'script':
                     $event->data['script'][] = array(
                             'type'    => 'text/javascript',
                             'charset' => 'utf-8',
-                            'src'    => $entry['path'],
+                            'src'    => $entry['src'],
                             '_data'   => '',
                     );
                     break;

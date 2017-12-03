@@ -50,6 +50,33 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addPattern($this->pattern[2], $this->mode);
     }
 
+
+    /**
+     * add an entry to dedicated class property 
+     */
+    private function _add_entry($tag, $data='') {
+        switch ($tag) {
+            case 'link':
+                $this->entries[] = array(
+                             '_tag' => 'link',
+                             'rel'  => 'stylesheet',
+                          // 'type' => 'text/css',
+                             'href' => $data,
+                );
+                break;
+            case 'js':
+                $this->entries[] = array(
+                             '_tag' => 'script',
+                          // 'type' => 'text/javascript',
+                             'src'  => $data,
+                             '_data'=> '',
+                );
+                break;
+        }
+        return count($this->entries);
+    }
+
+
     /**
      * Handle the match
      */
@@ -69,12 +96,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_MATCHED:
                 // assume rel="stylesheet", lazy handling of external css
                 if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
-                    $this->entries[] = array(
-                             '_tag' => 'link',
-                             'rel'  => 'stylesheet',
-                          // 'type' => 'text/css',
-                             'href' => $attrs[1],
-                    );
+                        $this->_add_entry('link', $attrs[1]);
                 }
                 return false;
 
@@ -90,19 +112,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                     if (!in_array($entrytype, array('css','js'))) {
                         continue;
                     } elseif ($entrytype == 'css') {
-                        $this->entries[] = array(
-                             '_tag' => 'link',
-                             'rel'  => 'stylesheet',
-                          // 'type' => 'text/css',
-                             'href' => $pathname,
-                        );
+                        $this->_add_entry('link', $pathname);
                     } elseif ($entrytype == 'js') {
-                        $this->entries[] = array(
-                             '_tag' => 'script',
-                          // 'type' => 'text/javascript',
-                             'src'  => $pathname,
-                             '_data'=> '',
-                        );
+                        $this->_add_entry('js', $pathname);
                     }
                 }
                 return false;
