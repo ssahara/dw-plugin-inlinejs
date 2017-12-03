@@ -73,7 +73,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                              '_tag' => 'link',
                              'rel'  => 'stylesheet',
                           // 'type' => 'text/css',
-                             'href' => $data,
+                             'href' => $attrs[1],
                     );
                 }
                 return false;
@@ -94,13 +94,13 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                              '_tag' => 'link',
                              'rel'  => 'stylesheet',
                           // 'type' => 'text/css',
-                             'href' => $data,
+                             'href' => $pathname,
                         );
                     } elseif ($entrytype == 'js') {
                         $this->entries[] = array(
                              '_tag' => 'script',
                           // 'type' => 'text/javascript',
-                             'src'  => $data,
+                             'src'  => $pathname,
                              '_data'=> '',
                         );
                     }
