@@ -15,6 +15,9 @@
  *           /path/to/javascript.js
  *           /path/to/stylesheet.css
  *           <link rel="stylesheet" href="//example.com/css">
+ *           <style>...</style>
+ *           <script src="//example.con/javascript.js"></script>
+ *           <script>...</script>
  *         </PRELOAD>
  */
 
@@ -31,7 +34,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
         // syntax pattern
         $this->pattern[1] = '<PRELOAD\b[^\n\r]*?>(?=.*?</PRELOAD>)';
-        $this->pattern[2] = '<link [^\n\r]*?>';
+        $this->pattern[21] = '<link [^\n\r]*?>';
+        $this->pattern[22] = '<style>.*?</style>';
+        $this->pattern[23] = '<script\b[^\n\r]*?>.*?</script>';
         $this->pattern[4] = '</PRELOAD>';
     }
 
@@ -47,7 +52,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     }
     function postConnect() {
         $this->Lexer->addExitPattern($this->pattern[4], $this->mode);
-        $this->Lexer->addPattern($this->pattern[2], $this->mode);
+        $this->Lexer->addPattern($this->pattern[21], $this->mode);
+        $this->Lexer->addPattern($this->pattern[22], $this->mode);
+        $this->Lexer->addPattern($this->pattern[23], $this->mode);
     }
 
 
@@ -62,6 +69,20 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                              'rel'  => 'stylesheet',
                           // 'type' => 'text/css',
                              'href' => $data,
+                );
+                break;
+            case 'style':
+                $this->entries[] = array(
+                             '_tag' => 'style',
+                          // 'type' => 'text/css',
+                             '_data' => $data,
+                );
+                break;
+            case 'script':
+                $this->entries[] = array(
+                             '_tag' => 'script',
+                          // 'type' => 'text/javascript',
+                             '_data'=> $data,
                 );
                 break;
             case 'js':
@@ -94,9 +115,25 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 return false;
 
             case DOKU_LEXER_MATCHED:
-                // assume rel="stylesheet", lazy handling of external css
-                if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
+                if ('link' == substr($match, 1, 4)) {
+                    // assume rel="stylesheet", lazy handling of external css
+                    if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
                         $this->_add_entry('link', $attrs[1]);
+                    }
+                } elseif ('style' == substr($match, 1, 5)) {
+                    $declarations = substr($match, 7, -8);
+                    if (!empty($declarations)) {
+                        $this->_add_entry('style', $declarations);
+                    }
+                } elseif ('script' == substr($match, 1, 6)) {
+                    if (preg_match('/\bsrc=\"([^\"]*)\" ?/', $match, $attrs)) {
+                        $this->_add_entry('js', $attrs[1]);
+                    } else {
+                        $source = substr($match, 8, -9);
+                        if (!empty($source)) {
+                            $this->_add_entry('script', $source);
+                        }
+                    }
                 }
                 return false;
 
@@ -109,12 +146,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
                     // check entry type for loacl file path
                     $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
-                    if (!in_array($entrytype, array('css','js'))) {
-                        continue;
-                    } elseif ($entrytype == 'css') {
-                        $this->_add_entry('link', $pathname);
-                    } elseif ($entrytype == 'js') {
-                        $this->_add_entry('js', $pathname);
+                    if (in_array($entrytype, array('css','js'))) {
+                        $tag = ($entrytype == 'css') ? 'link' : 'js';
+                        $this->_add_entry($tag, $pathname);
                     }
                 }
                 return false;
@@ -147,7 +181,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                     // debug: show what js/css is to be loaded in head section
                     $html = '<div class="notify">';
                     $html.= hsc($this->getLang('preloader-intro')).DOKU_LF;
-                    foreach ($data as $entry) {
+                    foreach ($entries as $entry) {
                         $attr = buildAttributes($entry);
                         $out = '<'.$entry['_tag'].($attr ? ' '.$attr : '');
                         if (isset($entry['_data'])) {

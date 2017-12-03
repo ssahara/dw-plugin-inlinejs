@@ -28,6 +28,12 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
 
         foreach ($INFO['meta']['plugin_inlinejs'] as $entry) {
             switch ($entry['_tag']) {
+                case 'style':
+                    $event->data['style'][] = array(
+                            'type'    => 'text/css',
+                            '_data'   => $entry['_data'],
+                    );
+                    break;
                 case 'link':
                     $event->data['link'][] = array(
                             'rel'     => 'stylesheet',
@@ -36,12 +42,20 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
                     );
                     break;
                 case 'script':
-                    $event->data['script'][] = array(
+                    if (isset($entry['src'])) {
+                        $event->data['script'][] = array(
                             'type'    => 'text/javascript',
                             'charset' => 'utf-8',
                             'src'    => $entry['src'],
                             '_data'   => '',
-                    );
+                        );
+                    } else {
+                        $event->data['script'][] = array(
+                            'type'    => 'text/javascript',
+                         // 'charset' => 'utf-8',
+                            '_data'   => $entry['_data'],
+                        );
+                    }
                     break;
             }
         }
