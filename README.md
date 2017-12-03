@@ -1,7 +1,7 @@
 DokuWiki plugin InlineJS
 ========================
 
-Allow internal JavaScript and StyleSheet in wiki pages.
+Allow adhoc internal JavaScript and StyleSheet in wiki pages.
 
 
 Syntax
@@ -25,7 +25,11 @@ Let some library files preloaded in specific DokuWiki pages
     <PRELOAD>
     /path/to/some.js     # depends on document root of web server
     /path/to/some.css
+    <script src="http://example.com/javascript.js"></script>         # external JavaScript
     <link rel="stylesheet" href="http://example.com/css?key=value">  # external css
+    <style>
+      ... css rule-set ...
+    </style>
     </PRELOAD>
 
 

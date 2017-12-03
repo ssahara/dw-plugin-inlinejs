@@ -13,11 +13,11 @@
  * SYNTAX:
  *         <PRELOAD debug>
  *           /path/to/javascript.js
- *           /path/to/stylesheet.css
- *           <link rel="stylesheet" href="//example.com/css">
- *           <style>...</style>
+ *           /path/to/style.css
  *           <script src="//example.con/javascript.js"></script>
+ *           <link rel="stylesheet" href="//example.com/style.css">
  *           <script>...</script>
+ *           <style>...</style>
  *         </PRELOAD>
  */
 
