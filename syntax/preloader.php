@@ -28,6 +28,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $mode, $pattern;
     protected $entries = array();
+    protected $opts    = array();
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
@@ -109,31 +110,38 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 $this->entries = array();
 
                 // check whether optional parameter exists
-                $opts['debug'] = (preg_match('/debug/',$match)) ? true : false;
-                if ($match != '<PRELOAD>') { $opts['debug'] = true; }
-                $this->entries['debug'] = $opts['debug'];
+                $this->opts['debug'] = (preg_match('/debug/',$match)) ? true : false;
+                if ($match != '<PRELOAD>') { $this->opts['debug'] = true; }
                 return false;
 
             case DOKU_LEXER_MATCHED:
-                if ('link' == substr($match, 1, 4)) {
-                    // assume rel="stylesheet", lazy handling of external css
-                    if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
-                        $this->_add_entry('link', $attrs[1]);
-                    }
-                } elseif ('style' == substr($match, 1, 5)) {
-                    $declarations = substr($match, 7, -8);
-                    if (!empty($declarations)) {
-                        $this->_add_entry('style', $declarations);
-                    }
-                } elseif ('script' == substr($match, 1, 6)) {
-                    if (preg_match('/\bsrc=\"([^\"]*)\" ?/', $match, $attrs)) {
-                        $this->_add_entry('js', $attrs[1]);
-                    } else {
-                        $source = substr($match, 8, -9);
-                        if (!empty($source)) {
-                            $this->_add_entry('script', $source);
+                // identify syntax
+                if (preg_match('/\w+/', substr($match, 1, 6), $matches)) {
+                    $tag = $matches[0];
+                }
+                switch ($tag) {
+                    case 'link':
+                        // assume rel="stylesheet", lazy handling of external css
+                        if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
+                            $this->_add_entry('link', $attrs[1]);
                         }
-                    }
+                        break;
+                    case 'style':
+                        $css = substr($match, 7, -8);
+                        if (!empty($css)) {
+                            $this->_add_entry('style', $css);
+                        }
+                        break;
+                    case 'script':
+                        if (preg_match('/\bsrc=\"([^\"]*)\" ?/', $match, $attrs)) {
+                            $this->_add_entry('js', $attrs[1]);
+                        } else {
+                            $source = substr($match, 8, -9);
+                            if (!empty($source)) {
+                                $this->_add_entry('script', $source);
+                            }
+                        }
+                        break;
                 }
                 return false;
 
@@ -144,7 +152,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                     list($pathname, $comment) = explode('#', $entry, 2);
                     $pathname = trim($pathname);
 
-                    // check entry type for loacl file path
+                    // check entry type for local file path
                     $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
                     if (in_array($entrytype, array('css','js'))) {
                         $tag = ($entrytype == 'css') ? 'link' : 'js';
@@ -154,7 +162,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 return false;
 
             case DOKU_LEXER_EXIT:
-                return $data = $this->entries;
+                return $data = array($this->opts, $this->entries);
         }
     }
 
@@ -166,18 +174,16 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         global $ID, $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
-        $entries =& $data;
+        list($opts, $entries) = $data;
 
         switch ($format) {
             case 'metadata' :
-                unset($entries['debug']);
                 // metadata will be treated by action plugin
                 $renderer->meta['plugin_inlinejs'] = $entries;
                 return true;
 
             case 'xhtml' :
-                if ($entries['debug']) {
-                    unset($entries['debug']);
+                if ($opts['debug']) {
                     // debug: show what js/css is to be loaded in head section
                     $html = '<div class="notify">';
                     $html.= hsc($this->getLang('preloader-intro')).DOKU_LF;
