@@ -91,7 +91,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                              '_tag' => 'script',
                           // 'type' => 'text/javascript',
                              'src'  => $data,
-                             '_data'=> '',
+                          // '_data'=> '',
                 );
                 break;
         }
@@ -184,9 +184,10 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
             case 'xhtml' :
                 if ($opts['debug']) {
-                    // debug: show what js/css is to be loaded in head section
+                    // debug: show html code to be added in head section
                     $html = '<div class="notify">';
                     $html.= hsc($this->getLang('preloader-intro')).DOKU_LF;
+                    $html.= '<ol>';
                     foreach ($entries as $entry) {
                         $attr = buildAttributes($entry);
                         $out = '<'.$entry['_tag'].($attr ? ' '.$attr : '');
@@ -195,9 +196,9 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                         } else {
                             $out.= '>';
                         }
-                        $html.= '<div style="white-space:pre; padding:0.1em;">'.hsc($out).'</div>'.DOKU_LF;
+                        $html.= '<li style="white-space:pre;">'.hsc($out).'</li>';
                     }
-                    $html.= '</div>'.DOKU_LF;
+                    $html.= '</ol></div>'.DOKU_LF;
                     $renderer->doc .= $html;
                 }
                 return true;
