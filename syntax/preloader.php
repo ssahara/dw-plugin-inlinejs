@@ -27,8 +27,8 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $mode, $pattern;
-    protected $entries = array();
-    protected $opts    = array();
+    protected $entries = null;
+    protected $opts    = null;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
@@ -107,6 +107,7 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         switch ($state) {
             case DOKU_LEXER_ENTER:
                 // initialize class property
+                $this->opts    = array();
                 $this->entries = array();
 
                 // check whether optional parameter exists
@@ -162,7 +163,10 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
                 return false;
 
             case DOKU_LEXER_EXIT:
-                return $data = array($this->opts, $this->entries);
+                $data = array($this->opts, $this->entries);
+                $this->opts    = null;
+                $this->entries = null;
+                return $data;
         }
     }
 
