@@ -104,6 +104,12 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
      */
     function handle($match, $state, $pos, Doku_Handler $handler) {
 
+        global $conf;
+        if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
+            msg($this->getPluginName().': '.$this->getPluginComponent().' is disabled.',-1);
+            return false;
+        }
+
         switch ($state) {
             case DOKU_LEXER_ENTER:
                 // initialize class property
@@ -174,9 +180,6 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($format, Doku_Renderer $renderer, $data) {
-
-        global $ID, $conf;
-        if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($opts, $entries) = $data;
 

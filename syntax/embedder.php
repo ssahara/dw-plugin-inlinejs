@@ -52,7 +52,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
         global $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
-            msg($this->getPluginName().': JavaScript embedding is disabled.',-1);
+            msg($this->getPluginName().': '.$this->getPluginComponent().' is disabled.',-1);
             return false;
         }
 
@@ -72,10 +72,9 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $indata) {
+    function render($format, Doku_Renderer $renderer, $data) {
 
-        if (empty($indata)) return false;
-        list($state, $data) = $indata;
+        list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
         switch ($state) {
@@ -85,8 +84,8 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
                 break;
 
             case DOKU_LEXER_UNMATCHED:
-                //$renderer->doc .= $renderer->_xmlEntities($data);
-                $renderer->doc .= $data; // raw write
+                //$renderer->doc .= $renderer->_xmlEntities($code);
+                $renderer->doc .= $code; // raw write
                 break;
 
             case DOKU_LEXER_EXIT:

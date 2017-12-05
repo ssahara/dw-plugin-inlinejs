@@ -20,7 +20,7 @@ require_once(dirname(__FILE__).'/embedder.php');
 
 class syntax_plugin_inlinejs_embedblock extends syntax_plugin_inlinejs_embedder {
 
-    //protected $mode, $pattern;
+  //protected $mode, $pattern;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
