@@ -22,6 +22,7 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
     protected $mode, $pattern;
+    protected $code = null;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
@@ -58,13 +59,22 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
         switch ($state) {
             case DOKU_LEXER_ENTER:
-                return array($state,'');
+                return false;
 
             case DOKU_LEXER_UNMATCHED:
-                return array($state, $match);
+                $this->code = $match;
+                return false;
 
             case DOKU_LEXER_EXIT:
-                return array($state, '');
+                $data = array($state, $this->code);
+                $this->code = null;
+
+                if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
+                    $msg = $this->getPluginComponent().' is disabled.';
+                    msg($this->getPluginName().': '.$msg, -1);
+                    return false;
+                }
+                return $data;
         }
         return false;
     }
@@ -77,22 +87,11 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
         list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
-        switch ($state) {
-            case DOKU_LEXER_ENTER:
-                $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
-                $renderer->doc .= $html;
-                break;
+        $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
+        $html.= $code;  // raw write
+        $html.= '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
+        $renderer->doc .= $html;
 
-            case DOKU_LEXER_UNMATCHED:
-                //$renderer->doc .= $renderer->_xmlEntities($code);
-                $renderer->doc .= $code; // raw write
-                break;
-
-            case DOKU_LEXER_EXIT:
-                $html = '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
-                $renderer->doc .= $html;
-                break;
-        }
         return true;
     }
 }
