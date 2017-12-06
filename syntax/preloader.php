@@ -13,8 +13,11 @@
  * SYNTAX:
  *         <PRELOAD debug>
  *           /path/to/javascript.js
- *           /path/to/stylesheet.css
- *           <link rel="stylesheet" href="//path/css">
+ *           /path/to/style.css
+ *           <script src="//example.con/javascript.js"></script>
+ *           <link rel="stylesheet" href="//example.com/style.css">
+ *           <script>...</script>
+ *           <style>...</style>
  *         </PRELOAD>
  */
 
@@ -24,12 +27,18 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
     protected $mode, $pattern;
+    protected $entries = null;
+    protected $opts    = null;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
 
         // syntax pattern
-        $this->pattern[5] = '<PRELOAD\b.*?</PRELOAD>';
+        $this->pattern[1] = '<PRELOAD\b[^\n\r]*?>(?=.*?</PRELOAD>)';
+        $this->pattern[21] = '<link [^\n\r]*?>';
+        $this->pattern[22] = '<style>.*?</style>';
+        $this->pattern[23] = '<script\b[^\n\r]*?>.*?</script>';
+        $this->pattern[4] = '</PRELOAD>';
     }
 
     function getType()  { return 'protected'; }
@@ -40,66 +49,139 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern($this->pattern[5], $mode, $this->mode);
+        $this->Lexer->addEntryPattern($this->pattern[1], $mode, $this->mode);
     }
+    function postConnect() {
+        $this->Lexer->addExitPattern($this->pattern[4], $this->mode);
+        $this->Lexer->addPattern($this->pattern[21], $this->mode);
+        $this->Lexer->addPattern($this->pattern[22], $this->mode);
+        $this->Lexer->addPattern($this->pattern[23], $this->mode);
+    }
+
+
+    /**
+     * add an entry to dedicated class property 
+     */
+    private function _add_entry($tag, $data='') {
+        switch ($tag) {
+            case 'link':
+                $this->entries[] = array(
+                             '_tag' => 'link',
+                             'rel'  => 'stylesheet',
+                          // 'type' => 'text/css',
+                             'href' => $data,
+                );
+                break;
+            case 'style':
+                $this->entries[] = array(
+                             '_tag' => 'style',
+                          // 'type' => 'text/css',
+                             '_data' => $data,
+                );
+                break;
+            case 'script':
+                $this->entries[] = array(
+                             '_tag' => 'script',
+                          // 'type' => 'text/javascript',
+                             '_data'=> $data,
+                );
+                break;
+            case 'js':
+                $this->entries[] = array(
+                             '_tag' => 'script',
+                          // 'type' => 'text/javascript',
+                             'src'  => $data,
+                          // '_data'=> '',
+                );
+                break;
+        }
+        return count($this->entries);
+    }
+
 
     /**
      * Handle the match
      */
     function handle($match, $state, $pos, Doku_Handler $handler) {
 
-        $match = substr($match, 8, -10);  // strip markup without '>' in open tag
-        $opts = array( // set default
-                     'debug'  => false,
-                );
+        global $conf;
 
-        // check whether optional parameter exists
-        if ( substr($match, 0, 1) != '>') {
-            list($param, $match) = explode('>',$match, 2);
-            if (preg_match('/debug/',$param)) {
-                $opts['debug'] = true;
-            }
-            $opts['debug'] = true;
-        } else {
-            $match = substr($match, 1); // strip '>' in open tag
-        }
+        switch ($state) {
+            case DOKU_LEXER_ENTER:
+                // initialize class property
+                $this->opts    = array();
+                $this->entries = array();
 
-        $matches = explode("\n", $match);
-        $entries = array();
-        foreach ($matches as $entry) {
-            // remove comment line after "#"
-            list($pathname, $comment) = explode('#', $entry, 2);
-            $pathname = trim($pathname);
-            if (empty($pathname) ) continue;
+                // check whether optional parameter exists
+                $this->opts['debug'] = (preg_match('/debug/',$match)) ? true : false;
+                if ($match != '<PRELOAD>') { $this->opts['debug'] = true; }
+                return false;
 
-            // check entry type
-            if (preg_match('/^<link .*>$/', $pathname)) {
-                // assume rel="stylesheet", lazy handling of external css
-                if (preg_match('/\bhref=\"([^\"]*)\" ?/', $pathname, $attrs)) {
-                    $pathname = $attrs[1];
-                    $entrytype = 'css';
+            case DOKU_LEXER_MATCHED:
+                // identify syntax
+                if (preg_match('/\w+/', substr($match, 1, 6), $matches)) {
+                    $tag = $matches[0];
                 }
-            } else {
-                // local file
-                $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
-            }
-            if (in_array($entrytype, array('css','js'))) {
-                $entries[] = array(
-                    'type' => $entrytype,
-                    'path' => $pathname,
-                );
-            }
+                switch ($tag) {
+                    case 'link':
+                        // assume rel="stylesheet", lazy handling of external css
+                        if (preg_match('/\bhref=\"([^\"]*)\" ?/', $match, $attrs)) {
+                            $this->_add_entry('link', $attrs[1]);
+                        }
+                        break;
+                    case 'style':
+                        $css = substr($match, 7, -8);
+                        if (!empty($css)) {
+                            $this->_add_entry('style', $css);
+                        }
+                        break;
+                    case 'script':
+                        if (preg_match('/\bsrc=\"([^\"]*)\" ?/', $match, $attrs)) {
+                            $this->_add_entry('js', $attrs[1]);
+                        } else {
+                            $source = substr($match, 8, -9);
+                            if (!empty($source)) {
+                                $this->_add_entry('script', $source);
+                            }
+                        }
+                        break;
+                }
+                return false;
+
+            case DOKU_LEXER_UNMATCHED:
+                $matches = explode("\n", $match);
+                foreach ($matches as $entry) {
+                    // remove comment line after "#"
+                    list($pathname, $comment) = explode('#', $entry, 2);
+                    $pathname = trim($pathname);
+
+                    // check entry type for local file path
+                    $entrytype = strtolower(pathinfo($pathname, PATHINFO_EXTENSION));
+                    if (in_array($entrytype, array('css','js'))) {
+                        $tag = ($entrytype == 'css') ? 'link' : 'js';
+                        $this->_add_entry($tag, $pathname);
+                    }
+                }
+                return false;
+
+            case DOKU_LEXER_EXIT:
+                $data = array($this->opts, $this->entries);
+                $this->opts    = null;
+                $this->entries = null;
+
+                if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
+                    $msg = $this->getPluginComponent().' is disabled.';
+                    msg($this->getPluginName().': '.$msg, -1);
+                    return false;
+                }
+                return $data;
         }
-        return (count($entries)) ? array($opts, $entries) : false;
     }
 
     /**
      * Create output
      */
     function render($format, Doku_Renderer $renderer, $data) {
-
-        global $ID, $conf;
-        if ($this->getConf('follow_htmlok') && !$conf['htmlok']) return false;
 
         list($opts, $entries) = $data;
 
@@ -111,13 +193,21 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
 
             case 'xhtml' :
                 if ($opts['debug']) {
-                    // debug: show what js/css is to be loaded in head section
+                    // debug: show html code to be added in head section
                     $html = '<div class="notify">';
-                    $html.= hsc($this->getLang('preloader-intro')).'<br />';
+                    $html.= hsc($this->getLang('preloader-intro')).DOKU_LF;
+                    $html.= '<ol>';
                     foreach ($entries as $entry) {
-                        $html.= '['.$entry['type'].'] '.$entry['path'].'<br />';
+                        $attr = buildAttributes($entry);
+                        $out = '<'.$entry['_tag'].($attr ? ' '.$attr : '');
+                        if (isset($entry['_data'])) {
+                            $out.= '>'.$entry['_data'].'</'.$entry['_tag'].'>';
+                        } else {
+                            $out.= '>';
+                        }
+                        $html.= '<li style="white-space:pre;">'.hsc($out).'</li>';
                     }
-                    $html.= '</div>'.DOKU_LF;
+                    $html.= '</ol></div>'.DOKU_LF;
                     $renderer->doc .= $html;
                 }
                 return true;

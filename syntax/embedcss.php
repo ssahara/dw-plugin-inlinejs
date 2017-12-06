@@ -19,7 +19,8 @@ require_once(dirname(__FILE__).'/embedder.php');
 
 class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
 
-    //protected $mode, $pattern;
+  //protected $mode, $pattern;
+  //protected $code = null;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
@@ -35,28 +36,16 @@ class syntax_plugin_inlinejs_embedcss extends syntax_plugin_inlinejs_embedder {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $indata) {
+    function render($format, Doku_Renderer $renderer, $data) {
 
-        if (empty($indata)) return false;
-        list($state, $data) = $indata;
+        list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
-        switch ($state) {
-            case DOKU_LEXER_ENTER:
-                $html = '<style type="text/css">'.DOKU_LF.'<!-- ';
-                $renderer->doc .= $html;
-                break;
+        $html = '<style type="text/css">'.DOKU_LF.'<!-- ';
+        $html.= $code;  // raw write
+        $html.= ' -->'.DOKU_LF.'</style>'.DOKU_LF;
+        $renderer->doc .= $html;
 
-            case DOKU_LEXER_UNMATCHED:
-                //$renderer->doc .= $renderer->_xmlEntities($data);
-                $renderer->doc .= $data; // raw write
-                break;
-
-            case DOKU_LEXER_EXIT:
-                $html = ' -->'.DOKU_LF.'</style>'.DOKU_LF;
-                $renderer->doc .= $html;
-                break;
-        }
         return true;
     }
 

@@ -22,6 +22,7 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
     protected $mode, $pattern;
+    protected $code = null;
 
     function __construct() {
         $this->mode = substr(get_class($this), 7); // drop 'syntax_'
@@ -52,19 +53,28 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
 
         global $conf;
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
-            msg($this->getPluginName().': JavaScript embedding is disabled.',-1);
+            msg($this->getPluginName().': '.$this->getPluginComponent().' is disabled.',-1);
             return false;
         }
 
         switch ($state) {
             case DOKU_LEXER_ENTER:
-                return array($state,'');
+                return false;
 
             case DOKU_LEXER_UNMATCHED:
-                return array($state, $match);
+                $this->code = $match;
+                return false;
 
             case DOKU_LEXER_EXIT:
-                return array($state, '');
+                $data = array($state, $this->code);
+                $this->code = null;
+
+                if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
+                    $msg = $this->getPluginComponent().' is disabled.';
+                    msg($this->getPluginName().': '.$msg, -1);
+                    return false;
+                }
+                return $data;
         }
         return false;
     }
@@ -72,28 +82,16 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $indata) {
+    function render($format, Doku_Renderer $renderer, $data) {
 
-        if (empty($indata)) return false;
-        list($state, $data) = $indata;
+        list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
-        switch ($state) {
-            case DOKU_LEXER_ENTER:
-                $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
-                $renderer->doc .= $html;
-                break;
+        $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
+        $html.= $code;  // raw write
+        $html.= '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
+        $renderer->doc .= $html;
 
-            case DOKU_LEXER_UNMATCHED:
-                //$renderer->doc .= $renderer->_xmlEntities($data);
-                $renderer->doc .= $data; // raw write
-                break;
-
-            case DOKU_LEXER_EXIT:
-                $html = '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
-                $renderer->doc .= $html;
-                break;
-        }
         return true;
     }
 }
