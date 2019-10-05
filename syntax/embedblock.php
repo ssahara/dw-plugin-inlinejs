@@ -18,18 +18,36 @@
 
 require_once(dirname(__FILE__).'/embedder.php');
 
-class syntax_plugin_inlinejs_embedblock extends syntax_plugin_inlinejs_embedder {
+class syntax_plugin_inlinejs_embedblock extends syntax_plugin_inlinejs_embedder
+{
+    public function getType()
+    {   // Syntax Type
+        return 'protected';
+    }
 
-  //protected $mode, $pattern;
-  //protected $code = null;
+    public function getPType()
+    {   // Paragraph Type
+        return 'block';
+    }
 
-    function __construct() {
-        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+    /**
+     * Connect pattern to lexer
+     */
+    //protected $mode, $pattern;
+
+    public function preConnect()
+    {
+        // drop 'syntax_' from class name
+        $this->mode = substr(get_class($this), 7);
 
         // syntax pattern
         $this->pattern[1] = '<JS>(?=.*?</JS>)';
         $this->pattern[4] = '</JS>';
     }
 
-    function getPType() { return 'block'; }
+    /**
+     * Plugin features
+     */
+    //protected $code = null;
+
 }
