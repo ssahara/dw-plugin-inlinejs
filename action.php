@@ -6,12 +6,13 @@
  * @author  Satoshi Sahara <sahara.satoshi@gmail.com>
  */
 // must be run within Dokuwiki
-if(!defined('DOKU_INC')) die();
+if (!defined('DOKU_INC')) die();
 
-class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
-
+class action_plugin_inlinejs extends DokuWiki_Action_Plugin
+{
     // register hook
-    function register(Doku_Event_Handler $controller) {
+    public function register(Doku_Event_Handler $controller)
+    {
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'inlinejs_handleMeta');
     }
 
@@ -20,8 +21,8 @@ class action_plugin_inlinejs extends DokuWiki_Action_Plugin {
      * TPL_METAHEADER_OUTPUT
      * add inline javascript and/or stylesheet to the <head> section.
      */
-    function inlinejs_handleMeta(Doku_Event $event, $param) {
-
+    public function inlinejs_handleMeta(Doku_Event $event, $param)
+    {
         global $INFO;
 
         if (!isset($INFO['meta']['plugin_inlinejs'])) return;

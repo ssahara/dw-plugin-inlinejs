@@ -24,14 +24,27 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 
-class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin
+{
+    public function getType()
+    {   // Syntax Type
+        return 'protected';
+    }
 
+    public function getPType()
+    {   // Paragraph Type
+        return 'block';
+    }
+
+    /**
+     * Connect pattern to lexer
+     */
     protected $mode, $pattern;
-    protected $entries = null;
-    protected $opts    = null;
 
-    function __construct() {
-        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+    public function preConnect()
+    {
+        // drop 'syntax_' from class name
+        $this->mode = substr(get_class($this), 7);
 
         // syntax pattern
         $this->pattern[1] = '<PRELOAD\b[^\n\r]*?>(?=.*?</PRELOAD>)';
@@ -41,28 +54,36 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
         $this->pattern[4] = '</PRELOAD>';
     }
 
-    function getType()  { return 'protected'; }
-    function getPType() { return 'block'; }
-    function getSort()  { return 110; }
-
-    /**
-     * Connect pattern to lexer
-     */
-    function connectTo($mode) {
+    public function connectTo($mode)
+    {
         $this->Lexer->addEntryPattern($this->pattern[1], $mode, $this->mode);
     }
-    function postConnect() {
+
+    public function postConnect()
+    {
         $this->Lexer->addExitPattern($this->pattern[4], $this->mode);
         $this->Lexer->addPattern($this->pattern[21], $this->mode);
         $this->Lexer->addPattern($this->pattern[22], $this->mode);
         $this->Lexer->addPattern($this->pattern[23], $this->mode);
     }
 
+    public function getSort()
+    {   // sort number used to determine priority of this mode
+        return 110;
+    }
+
+
+    /**
+     * Plugin features
+     */
+    protected $entries = null;
+    protected $opts    = null;
 
     /**
      * add an entry to dedicated class property 
      */
-    private function _add_entry($tag, $data='') {
+    private function _add_entry($tag, $data='')
+    {
         switch ($tag) {
             case 'link':
                 $this->entries[] = array(
@@ -102,8 +123,8 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, Doku_Handler $handler) {
-
+    public function handle($match, $state, $pos, Doku_Handler $handler)
+    {
         global $conf;
 
         switch ($state) {
@@ -181,8 +202,8 @@ class syntax_plugin_inlinejs_preloader extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $data) {
-
+    public function render($format, Doku_Renderer $renderer, $data)
+    {
         list($opts, $entries) = $data;
 
         switch ($format) {

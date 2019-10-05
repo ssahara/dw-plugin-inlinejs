@@ -19,39 +19,61 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 
-class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin
+{
+    public function getType()
+    {   // Syntax Type
+        return 'protected';
+    }
 
+    public function getPType()
+    {   // Paragraph Type
+        return 'block';
+    }
+
+    /**
+     * Connect pattern to lexer
+     */
     protected $mode, $pattern;
-    protected $code = null;
 
-    function __construct() {
-        $this->mode = substr(get_class($this), 7); // drop 'syntax_'
+    public function preConnect()
+    {
+        // drop 'syntax_' from class name
+        $this->mode = substr(get_class($this), 7);
 
         // syntax pattern
         $this->pattern[1] = '<javascript>(?=.*?</javascript>)';
         $this->pattern[4] = '</javascript>';
     }
 
-    function getType()  { return 'protected'; }
-    function getPType() { return 'block'; }
-    function getSort()  { return 305; }
-
-    /**
-     * Connect pattern to lexer
-     */
-    function connectTo($mode) {
+    public function connectTo($mode)
+    {
         $this->Lexer->addEntryPattern($this->pattern[1], $mode, $this->mode);
     }
-    function postConnect() {
+
+    public function postConnect()
+    {
         $this->Lexer->addExitPattern($this->pattern[4], $this->mode);
     }
+
+    public function getSort()
+    {   // sort number used to determine priority of this mode
+        return 305;
+    }
+
+    /**
+     * Plugin features
+     */
+    protected $code = null;
+
 
     /**
      * handle the match
      */
-    function handle($match, $state, $pos, Doku_Handler $handler) {
-
+    public function handle($match, $state, $pos, Doku_Handler $handler)
+    {
         global $conf;
+
         if ($this->getConf('follow_htmlok') && !$conf['htmlok']) {
             msg($this->getPluginName().': '.$this->getPluginComponent().' is disabled.',-1);
             return false;
@@ -82,8 +104,8 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $data) {
-
+    public function render($format, Doku_Renderer $renderer, $data)
+    {
         list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
