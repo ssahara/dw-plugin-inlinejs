@@ -109,7 +109,7 @@ class syntax_plugin_inlinejs_embedder extends DokuWiki_Syntax_Plugin
         list($state, $code) = $data;
         if ($format != 'xhtml') return false;
 
-        $html = '<script type="text/javascript">'.DOKU_LF.'/*<![CDATA[*/';
+        $html = '<script type="module">'.DOKU_LF.'/*<![CDATA[*/';
         $html.= $code;  // raw write
         $html.= '/*!]]>*/'.DOKU_LF.'</script>'.DOKU_LF;
         $renderer->doc .= $html;
